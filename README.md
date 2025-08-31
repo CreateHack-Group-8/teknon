@@ -130,7 +130,7 @@ docker run --name postgres-vulnerability \
 2. Update `.env` with your database connection:
    ```env
    DATABASE_URL="postgresql://postgres:password@localhost:5432/vulnerability_platform?schema=public"
-   PORT=3002
+   PORT=3001
    JWT_SECRET="your-secure-jwt-secret"
    ```
 
@@ -155,14 +155,14 @@ npm run dev
 
 ### 6. Verify installation
 ```bash
-curl http://localhost:3002/health
+curl http://localhost:3001/health
 ```
 
 ## 📊 Usage Examples
 
 ### Create a Missionary User
 ```bash
-curl -X POST http://localhost:3002/api/users \
+curl -X POST http://localhost:3001/api/users \
   -H "Content-Type: application/json" \
   -d '{
     "nome": "João Silva",
@@ -174,7 +174,7 @@ curl -X POST http://localhost:3002/api/users \
 
 ### Create a Project
 ```bash
-curl -X POST http://localhost:3002/api/projects \
+curl -X POST http://localhost:3001/api/projects \
   -H "Content-Type: application/json" \
   -d '{
     "nome": "Projeto Vila Nova",
@@ -186,7 +186,7 @@ curl -X POST http://localhost:3002/api/projects \
 
 ### Register a Person
 ```bash
-curl -X POST http://localhost:3002/api/persons \
+curl -X POST http://localhost:3001/api/persons \
   -H "Content-Type: application/json" \
   -d '{
     "id_interno": "P001",
@@ -201,7 +201,7 @@ curl -X POST http://localhost:3002/api/persons \
 
 ### Add Dynamic Metadata
 ```bash
-curl -X POST http://localhost:3002/api/dynamic-metadata \
+curl -X POST http://localhost:3001/api/dynamic-metadata \
   -H "Content-Type: application/json" \
   -d '{
     "person_id": "PERSON_ID_HERE",

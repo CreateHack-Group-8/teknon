@@ -32,11 +32,11 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: production
-      PORT: 3002
+      PORT: 3001
       DATABASE_URL: postgresql://postgres:postgres123@postgres:5432/vulnerability_platform
       JWT_SECRET: your_jwt_secret_here_change_in_production
     ports:
-      - "3002:3002"
+      - "3001:3001"
     depends_on:
       postgres:
         condition: service_healthy
