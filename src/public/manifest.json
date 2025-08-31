@@ -1,0 +1,26 @@
+{
+  "name": "TEKNON - Sistema de Gestão",
+  "short_name": "TEKNON",
+  "description": "Sistema de gestão de projetos e pessoas TEKNON",
+  "start_url": "/web/",
+  "display": "standalone",
+  "background_color": "#0D3063",
+  "theme_color": "#0D3063",
+  "icons": [
+    {
+      "src": "/web/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/web/favicon.ico",
+      "sizes": "16x16 32x32 48x48",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/web/favicon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}

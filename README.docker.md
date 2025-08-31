@@ -20,9 +20,9 @@ docker-compose up -d --build
 ```
 
 A aplicação estará disponível em:
-- **API**: http://localhost:3002
-- **Swagger Documentation**: http://localhost:3002/api-docs
-- **Health Check**: http://localhost:3002/health
+- **API**: http://localhost:3001
+- **Swagger Documentation**: http://localhost:3001/api-docs
+- **Health Check**: http://localhost:3001/health
 
 ### 2. Executar apenas PostgreSQL (Desenvolvimento)
 
@@ -64,13 +64,13 @@ Prisma Studio estará disponível em: http://localhost:5555
 As seguintes variáveis são configuradas automaticamente no Docker:
 
 - `NODE_ENV=production`
-- `PORT=3002`
+- `PORT=3001`
 - `DATABASE_URL=postgresql://postgres:postgres123@postgres:5432/vulnerability_platform`
 - `JWT_SECRET=your_jwt_secret_here_change_in_production`
 
 ### Portas Utilizadas
 
-- **3002**: API da aplicação
+- **3001**: API da aplicação
 - **5432**: PostgreSQL (produção)
 - **5433**: PostgreSQL (desenvolvimento)
 - **5555**: Prisma Studio
@@ -136,7 +136,7 @@ docker-compose exec app sh
 Se encontrar erro de porta em uso:
 ```bash
 # Verificar processos usando a porta
-lsof -i :3002
+lsof -i :3001
 lsof -i :5432
 
 # Parar containers existentes
