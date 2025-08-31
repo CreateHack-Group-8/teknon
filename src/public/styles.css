@@ -1,0 +1,24 @@
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial}
+.topbar{display:flex;align-items:center;gap:16px;justify-content:space-between;padding:12px 20px;border-bottom:1px solid #eee}
+.brand{font-weight:700}
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 50px)}
+.sidebar{border-right:1px solid #eee;padding:16px}
+.sidebar nav{display:flex;flex-direction:column;gap:8px}
+.sidebar a{color:#222;text-decoration:none;padding:8px;border-radius:6px}
+.sidebar a.active,.sidebar a:hover{background:#f4f6f8}
+.content{padding:24px}
+.panel{background:#fff;border:1px solid #eee;border-radius:10px;overflow:hidden}
+.panel-header{display:flex;align-items:center;justify-content:space-between;padding:16px;border-bottom:1px solid #eee}
+.panel-body{padding:16px}
+.card{border:1px solid #eee;border-radius:8px;padding:16px;max-width:360px}
+.hidden{display:none}
+.toolbar{margin-bottom:12px}
+.list{width:100%;border-collapse:collapse}
+.list th,.list td{padding:10px;border-bottom:1px solid #f0f0f0;text-align:left}
+input,textarea,button{width:100%;padding:10px;margin:6px 0;border:1px solid #ddd;border-radius:6px}
+button{cursor:pointer;background:#1a73e8;color:white;border:0}
+button:hover{background:#1558b0}
+dialog{border:0;border-radius:10px;padding:0}
+dialog form{padding:16px;min-width:320px}
+menu{display:flex;gap:8px;justify-content:flex-end}
+

@@ -1,0 +1,186 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  user_id       String   @id @default(uuid()) @db.Uuid
+  nome          String   @db.VarChar(255)
+  email         String   @unique @db.VarChar(255)
+  senha_hash    String   @db.VarChar(255)
+  tipo_usuario  TipoUsuario
+  status        StatusUsuario @default(PENDENTE)
+  data_cadastro DateTime @default(now())
+  ultimo_login  DateTime?
+
+  // Relacionamentos
+  projects_owned            Project[] @relation("ProjectOwner")
+  person_missionary_assignments PersonMissionaryAssignment[]
+  project_users             ProjectUser[]
+
+  @@map("users")
+}
+
+model Project {
+  project_id    String   @id @default(uuid()) @db.Uuid
+  nome          String   @unique @db.VarChar(255)
+  descricao     String?  @db.Text
+  regiao        String   @db.VarChar(255)
+  data_criacao  DateTime @default(now())
+  missionary_owner_id String @db.Uuid
+
+  // Relacionamentos
+  missionary_owner User @relation("ProjectOwner", fields: [missionary_owner_id], references: [user_id])
+  project_persons  ProjectPerson[]
+  project_users    ProjectUser[]
+  checkpoints      Checkpoint[]
+
+  @@map("projects")
+}
+
+model Person {
+  person_id       String   @id @default(uuid()) @db.Uuid
+  id_interno      String   @unique @default(cuid()) @db.VarChar(50)
+  nome            String   @db.VarChar(255)
+  data_nascimento DateTime? @db.Date
+  genero          String?  @db.VarChar(50)
+  endereco        String?  @db.Text
+  contato         Json?    @db.JsonB
+  dados_sensivel  Json?    @db.JsonB
+  data_cadastro   DateTime @default(now())
+  origem          String?  @db.VarChar(255)
+
+  // Relacionamentos
+  person_missionary_assignments PersonMissionaryAssignment[]
+  dynamic_metadata             DynamicMetadata[]
+  project_persons              ProjectPerson[]
+  checkpoint_progress          CheckpointProgress[]
+
+  @@map("persons")
+}
+
+model PersonMissionaryAssignment {
+  assignment_id  String    @id @default(uuid()) @db.Uuid
+  person_id      String    @db.Uuid
+  missionary_id  String    @db.Uuid
+  data_inicio    DateTime  @default(now())
+  data_fim       DateTime?
+
+  // Relacionamentos
+  person     Person @relation(fields: [person_id], references: [person_id])
+  missionary User   @relation(fields: [missionary_id], references: [user_id])
+
+  @@map("person_missionary_assignments")
+}
+
+model DynamicMetadata {
+  metadata_id     String   @id @default(uuid()) @db.Uuid
+  person_id       String   @db.Uuid
+  tipo_metadado   TipoMetadado
+  categoria       String   @db.VarChar(255)
+  sub_categoria   String?  @db.VarChar(255)
+  descricao       String   @db.Text
+  data_ocorrencia DateTime?
+  detalhes_json   Json?    @db.JsonB
+  data_registro   DateTime @default(now())
+
+  // Relacionamentos
+  person Person @relation(fields: [person_id], references: [person_id])
+
+  @@map("dynamic_metadata")
+}
+
+model ProjectPerson {
+  project_person_id String   @id @default(uuid()) @db.Uuid
+  project_id        String   @db.Uuid
+  person_id         String   @db.Uuid
+  data_associacao   DateTime @default(now())
+
+  // Relacionamentos
+  project Project @relation(fields: [project_id], references: [project_id])
+  person  Person  @relation(fields: [person_id], references: [person_id])
+
+  @@map("project_persons")
+}
+
+model ProjectUser {
+  project_user_id String   @id @default(uuid()) @db.Uuid
+  project_id      String   @db.Uuid
+  user_id         String   @db.Uuid
+  role            ProjectUserRole @default(PARTICIPANTE)
+  data_associacao DateTime @default(now())
+
+  // Relacionamentos
+  project Project @relation(fields: [project_id], references: [project_id])
+  user    User    @relation(fields: [user_id], references: [user_id])
+
+  @@unique([project_id, user_id])
+  @@map("project_users")
+}
+
+model Checkpoint {
+  checkpoint_id String   @id @default(uuid()) @db.Uuid
+  project_id    String   @db.Uuid
+  nome          String   @db.VarChar(255)
+  peso          Int
+  data_criacao  DateTime @default(now())
+
+  // Relacionamentos
+  project             Project             @relation(fields: [project_id], references: [project_id])
+  checkpoint_progress CheckpointProgress[]
+
+  @@map("checkpoints")
+}
+
+model CheckpointProgress {
+  progress_id      String         @id @default(uuid()) @db.Uuid
+  person_id        String         @db.Uuid
+  checkpoint_id    String         @db.Uuid
+  status           StatusProgress @default(PENDENTE)
+  data_atualizacao DateTime       @default(now())
+  observacoes      String?        @db.Text
+
+  // Relacionamentos
+  person     Person     @relation(fields: [person_id], references: [person_id])
+  checkpoint Checkpoint @relation(fields: [checkpoint_id], references: [checkpoint_id])
+
+  @@unique([person_id, checkpoint_id])
+  @@map("checkpoint_progress")
+}
+
+// Enums
+enum TipoUsuario {
+  MISSIONARIO @map("missionario")
+  INVESTIDOR  @map("investidor")
+}
+
+enum StatusUsuario {
+  ATIVO    @map("ativo")
+  INATIVO  @map("inativo")
+  PENDENTE @map("pendente")
+}
+
+enum TipoMetadado {
+  EXPERIENCIA   @map("experiencia")
+  ACONTECIMENTO @map("acontecimento")
+}
+
+enum StatusProgress {
+  PENDENTE     @map("pendente")
+  EM_PROGRESSO @map("em_progresso")
+  CONCLUIDO    @map("concluido")
+}
+
+enum ProjectUserRole {
+  PROPRIETARIO  @map("proprietario")
+  MISSIONARIO   @map("missionario")
+  INVESTIDOR    @map("investidor")
+  PARTICIPANTE  @map("participante")
+}

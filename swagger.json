@@ -1,0 +1,2045 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Vulnerability Assistance Platform API",
+    "version": "1.0.0",
+    "description": "API para plataforma de acompanhamento de pessoas em vulnerabilidade urbana",
+    "contact": {
+      "name": "API Support",
+      "email": "support@vulnerability-platform.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3002",
+      "description": "Development server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Token JWT válido por 5 dias"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "required": [
+          "nome",
+          "email",
+          "senha",
+          "tipo_usuario"
+        ],
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID único do usuário (auto-gerado)",
+            "readOnly": true
+          },
+          "nome": {
+            "type": "string",
+            "maxLength": 255,
+            "description": "Nome completo do usuário"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 255,
+            "description": "Email único do usuário"
+          },
+          "senha": {
+            "type": "string",
+            "description": "Senha do usuário (apenas para criação)"
+          },
+          "tipo_usuario": {
+            "type": "string",
+            "enum": [
+              "missionario",
+              "investidor"
+            ],
+            "description": "Tipo de usuário"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ativo",
+              "inativo",
+              "pendente"
+            ],
+            "description": "Status do usuário"
+          },
+          "data_cadastro": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data de cadastro"
+          },
+          "ultimo_login": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Data do último login"
+          }
+        }
+      },
+      "Project": {
+        "type": "object",
+        "required": [
+          "nome",
+          "regiao",
+          "missionary_owner_id"
+        ],
+        "properties": {
+          "project_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID único do projeto (auto-gerado)",
+            "readOnly": true
+          },
+          "nome": {
+            "type": "string",
+            "maxLength": 255,
+            "description": "Nome único do projeto"
+          },
+          "descricao": {
+            "type": "string",
+            "description": "Descrição do projeto"
+          },
+          "regiao": {
+            "type": "string",
+            "maxLength": 255,
+            "description": "Região do projeto"
+          },
+          "data_criacao": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data de criação"
+          },
+          "missionary_owner_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID do missionário responsável (extraído do token JWT)"
+          }
+        }
+      },
+      "Person": {
+        "type": "object",
+        "required": [
+          "nome"
+        ],
+        "properties": {
+          "person_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID único da pessoa (auto-gerado)",
+            "readOnly": true
+          },
+          "id_interno": {
+            "type": "string",
+            "maxLength": 50,
+            "readOnly": true,
+            "description": "ID interno único gerado automaticamente"
+          },
+          "nome": {
+            "type": "string",
+            "maxLength": 255,
+            "description": "Nome completo"
+          },
+          "data_nascimento": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "description": "Data de nascimento"
+          },
+          "genero": {
+            "type": "string",
+            "maxLength": 50,
+            "nullable": true,
+            "description": "Gênero"
+          },
+          "endereco": {
+            "type": "string",
+            "nullable": true,
+            "description": "Endereço completo"
+          },
+          "contato": {
+            "type": "object",
+            "nullable": true,
+            "description": "Informações de contato (JSON)"
+          },
+          "dados_sensivel": {
+            "type": "object",
+            "nullable": true,
+            "description": "Dados sensíveis (JSON)"
+          },
+          "data_cadastro": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data de cadastro"
+          },
+          "origem": {
+            "type": "string",
+            "maxLength": 255,
+            "nullable": true,
+            "description": "Origem da pessoa"
+          }
+        }
+      },
+      "DynamicMetadata": {
+        "type": "object",
+        "required": [
+          "person_id",
+          "tipo_metadado",
+          "categoria",
+          "descricao"
+        ],
+        "properties": {
+          "metadata_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID único do metadado (auto-gerado)",
+            "readOnly": true
+          },
+          "person_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID da pessoa"
+          },
+          "tipo_metadado": {
+            "type": "string",
+            "enum": [
+              "experiencia",
+              "acontecimento"
+            ],
+            "description": "Tipo do metadado"
+          },
+          "categoria": {
+            "type": "string",
+            "maxLength": 255,
+            "description": "Categoria do metadado"
+          },
+          "sub_categoria": {
+            "type": "string",
+            "maxLength": 255,
+            "nullable": true,
+            "description": "Subcategoria"
+          },
+          "descricao": {
+            "type": "string",
+            "description": "Descrição detalhada"
+          },
+          "data_ocorrencia": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Data da ocorrência"
+          },
+          "detalhes_json": {
+            "type": "object",
+            "nullable": true,
+            "description": "Detalhes adicionais (JSON)"
+          },
+          "data_registro": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data de registro"
+          }
+        }
+      },
+      "Checkpoint": {
+        "type": "object",
+        "required": [
+          "project_id",
+          "nome",
+          "peso"
+        ],
+        "properties": {
+          "checkpoint_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID único do checkpoint (auto-gerado)",
+            "readOnly": true
+          },
+          "project_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID do projeto"
+          },
+          "nome": {
+            "type": "string",
+            "maxLength": 255,
+            "description": "Nome do checkpoint"
+          },
+          "peso": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Peso do checkpoint"
+          },
+          "data_criacao": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data de criação"
+          }
+        }
+      },
+      "CheckpointProgress": {
+        "type": "object",
+        "required": [
+          "person_id",
+          "checkpoint_id"
+        ],
+        "properties": {
+          "progress_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID único do progresso (auto-gerado)",
+            "readOnly": true
+          },
+          "person_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID da pessoa"
+          },
+          "checkpoint_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID do checkpoint"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pendente",
+              "em_progresso",
+              "concluido"
+            ],
+            "description": "Status do progresso"
+          },
+          "data_atualizacao": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data da última atualização"
+          },
+          "observacoes": {
+            "type": "string",
+            "nullable": true,
+            "description": "Observações sobre o progresso"
+          }
+        }
+      },
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Indica se a operação foi bem-sucedida"
+          },
+          "data": {
+            "type": "object",
+            "description": "Dados retornados"
+          },
+          "message": {
+            "type": "string",
+            "description": "Mensagem de resposta"
+          },
+          "count": {
+            "type": "integer",
+            "description": "Número de itens (para listas)"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "description": "Mensagem de erro"
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "senha"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email do usuário"
+          },
+          "senha": {
+            "type": "string",
+            "description": "Senha do usuário"
+          }
+        },
+        "example": {
+          "email": "joao@example.com",
+          "senha": "senha123"
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "token": {
+                "type": "string",
+                "description": "Token JWT válido por 5 dias"
+              },
+              "user": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "nome": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "tipo": {
+                    "type": "string",
+                    "enum": [
+                      "MISSIONARIO",
+                      "INVESTIDOR"
+                    ]
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "ATIVO",
+                      "INATIVO"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/api/auth/login": {
+      "post": {
+        "summary": "Realizar login e obter token JWT",
+        "tags": [
+          "Authentication"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login realizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Credenciais inválidas"
+          }
+        }
+      }
+    },
+    "/api/auth/validate": {
+      "get": {
+        "summary": "Validar token JWT",
+        "tags": [
+          "Authentication"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Token válido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "user": {
+                          "type": "object"
+                        }
+                      }
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token inválido ou expirado"
+          }
+        }
+      }
+    },
+    "/api/checkpoint-progress": {
+      "post": {
+        "summary": "Registrar progresso em checkpoint",
+        "tags": [
+          "Checkpoint Progress"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckpointProgress"
+              },
+              "example": {
+                "person_id": "uuid-da-pessoa",
+                "checkpoint_id": "uuid-do-checkpoint",
+                "status": "em_progresso",
+                "observacoes": "Primeira consulta realizada com sucesso"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Progresso registrado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Erro de validação",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Listar progressos",
+        "tags": [
+          "Checkpoint Progress"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "person_id",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Filtrar por ID da pessoa"
+          },
+          {
+            "in": "query",
+            "name": "checkpoint_id",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Filtrar por ID do checkpoint"
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pendente",
+                "em_progresso",
+                "concluido"
+              ]
+            },
+            "description": "Filtrar por status"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de progressos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/checkpoint-progress/{id}": {
+      "get": {
+        "summary": "Buscar progresso por ID",
+        "tags": [
+          "Checkpoint Progress"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "ID do progresso"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Progresso encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Progresso não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Atualizar progresso",
+        "tags": [
+          "Checkpoint Progress"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "ID do progresso"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckpointProgress"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Progresso atualizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Erro de validação",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Remover progresso",
+        "tags": [
+          "Checkpoint Progress"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "ID do progresso"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Progresso removido com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Progresso não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/checkpoints": {
+      "post": {
+        "summary": "Criar novo checkpoint",
+        "tags": [
+          "Checkpoints"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Checkpoint"
+              },
+              "example": {
+                "project_id": "uuid-do-projeto",
+                "nome": "Primeira Consulta",
+                "peso": 10
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Checkpoint criado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Erro de validação",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Listar checkpoints",
+        "tags": [
+          "Checkpoints"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "project_id",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Filtrar por ID do projeto"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de checkpoints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/checkpoints/{id}": {
+      "get": {
+        "summary": "Buscar checkpoint por ID",
+        "tags": [
+          "Checkpoints"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "ID do checkpoint"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Checkpoint encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Checkpoint não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Atualizar checkpoint",
+        "tags": [
+          "Checkpoints"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "ID do checkpoint"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Checkpoint"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Checkpoint atualizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Erro de validação",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Deletar checkpoint",
+        "tags": [
+          "Checkpoints"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "ID do checkpoint"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Checkpoint deletado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Checkpoint não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/metadata": {
+      "post": {
+        "summary": "Registrar novo metadado",
+        "tags": [
+          "Metadata"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DynamicMetadata"
+              },
+              "example": {
+                "person_id": "uuid-da-pessoa",
+                "tipo_metadado": "experiencia",
+                "categoria": "Educação",
+                "sub_categoria": "Alfabetização",
+                "descricao": "Participou do programa de alfabetização",
+                "detalhes_json": {
+                  "nivel": "básico",
+                  "duracao": "6 meses"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Metadado registrado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Erro de validação",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Listar metadados",
+        "tags": [
+          "Metadata"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "person_id",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Filtrar por ID da pessoa"
+          },
+          {
+            "in": "query",
+            "name": "tipo_metadado",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "experiencia",
+                "acontecimento"
+              ]
+            },
+            "description": "Filtrar por tipo de metadado"
+          },
+          {
+            "in": "query",
+            "name": "categoria",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtrar por categoria"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de metadados",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/metadata/{id}": {
+      "get": {
+        "summary": "Buscar metadado por ID",
+        "tags": [
+          "Metadata"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "ID do metadado"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Metadado encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Metadado não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Atualizar metadado",
+        "tags": [
+          "Metadata"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "ID do metadado"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DynamicMetadata"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Metadado atualizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Erro de validação",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Remover metadado",
+        "tags": [
+          "Metadata"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "ID do metadado"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Metadado removido com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Metadado não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/persons": {
+      "post": {
+        "summary": "Cadastrar nova pessoa",
+        "tags": [
+          "Persons"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Person"
+              },
+              "example": {
+                "id_interno": "PES001",
+                "nome": "Maria Silva",
+                "genero": "Feminino",
+                "endereco": "Rua das Flores, 123",
+                "contato": {
+                  "telefone": "11999999999",
+                  "email": "maria@example.com"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Pessoa cadastrada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Erro de validação",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Listar pessoas",
+        "tags": [
+          "Persons"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "nome",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtrar por nome"
+          },
+          
+          {
+            "in": "query",
+            "name": "genero",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtrar por gênero"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de pessoas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/persons/{id}": {
+      "get": {
+        "summary": "Buscar pessoa por ID",
+        "tags": [
+          "Persons"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "ID da pessoa"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pessoa encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Pessoa não encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Atualizar dados da pessoa",
+        "tags": [
+          "Persons"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "ID da pessoa"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Person"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Pessoa atualizada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Erro de validação",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Remover pessoa do sistema",
+        "tags": [
+          "Persons"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "ID da pessoa"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pessoa removida com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Pessoa não encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects": {
+      "post": {
+        "summary": "Criar novo projeto",
+        "tags": [
+          "Projects"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Project"
+              },
+              "example": {
+                "nome": "Projeto Vila Nova",
+                "descricao": "Assistência a famílias em vulnerabilidade",
+                "regiao": "Vila Nova"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Projeto criado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Erro de validação",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Listar projetos",
+        "tags": [
+          "Projects"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "missionary_id",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Filtrar por ID do missionário (opcional - missionários veem apenas seus projetos)"
+          },
+          {
+            "in": "query",
+            "name": "regiao",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtrar por região"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de projetos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/{id}": {
+      "get": {
+        "summary": "Buscar projeto por ID",
+        "tags": [
+          "Projects"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "ID do projeto"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Projeto encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Projeto não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Atualizar projeto",
+        "tags": [
+          "Projects"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "ID do projeto"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Project"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Projeto atualizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Erro de validação",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Deletar projeto",
+        "tags": [
+          "Projects"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "ID do projeto"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Projeto deletado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Projeto não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users": {
+      "post": {
+        "summary": "Criar novo usuário",
+        "tags": [
+          "Users"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              },
+              "example": {
+                "nome": "João Silva",
+                "email": "joao@example.com",
+                "senha": "123456",
+                "tipo_usuario": "missionario"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuário criado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Erro de validação",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Listar usuários",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "tipo_usuario",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "missionario",
+                "investidor"
+              ]
+            },
+            "description": "Filtrar por tipo de usuário"
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ativo",
+                "inativo",
+                "pendente"
+              ]
+            },
+            "description": "Filtrar por status"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de usuários",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{id}": {
+      "get": {
+        "summary": "Buscar usuário por ID",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "ID do usuário"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuário encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuário não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Atualizar usuário",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "ID do usuário"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Usuário atualizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Erro de validação",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuário não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Deletar usuário",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "ID do usuário"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuário deletado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuário não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/login": {
+      "post": {
+        "summary": "Realizar login de usuário",
+        "tags": [
+          "Users"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "senha"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Email do usuário"
+                  },
+                  "senha": {
+                    "type": "string",
+                    "description": "Senha do usuário"
+                  }
+                },
+                "example": {
+                  "email": "joao@example.com",
+                  "senha": "senha123"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login realizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "token": {
+                          "type": "string",
+                          "description": "Token JWT válido por 5 dias"
+                        },
+                        "user": {
+                          "type": "object",
+                          "properties": {
+                            "user_id": {
+                              "type": "string",
+                              "format": "uuid"
+                            },
+                            "nome": {
+                              "type": "string"
+                            },
+                            "email": {
+                              "type": "string"
+                            },
+                            "tipo": {
+                              "type": "string",
+                              "enum": [
+                                "MISSIONARIO",
+                                "INVESTIDOR"
+                              ]
+                            },
+                            "status": {
+                              "type": "string",
+                              "enum": [
+                                "ATIVO",
+                                "INATIVO"
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Credenciais inválidas ou usuário inativo"
+          }
+        }
+      }
+    },
+    "/api/users/validate-token": {
+      "get": {
+        "summary": "Validar token JWT",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Token válido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "user": {
+                          "type": "object"
+                        }
+                      }
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token inválido ou expirado"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Checkpoint Progress",
+      "description": "Gerenciamento do progresso individual nos checkpoints"
+    },
+    {
+      "name": "Checkpoints",
+      "description": "Gerenciamento de marcos de progresso dos projetos"
+    },
+    {
+      "name": "Metadata",
+      "description": "Gerenciamento de metadados dinâmicos (experiências e acontecimentos)"
+    },
+    {
+      "name": "Persons",
+      "description": "Gerenciamento de pessoas em vulnerabilidade"
+    },
+    {
+      "name": "Projects",
+      "description": "Gerenciamento de projetos de assistência"
+    },
+    {
+      "name": "Users",
+      "description": "Gerenciamento de usuários (missionários e investidores)"
+    }
+  ]
+}

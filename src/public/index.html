@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Meus projetos</title>
+    <link rel="stylesheet" href="/web/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">Teknon</div>
+      <div class="search"><input id="search" placeholder="Buscar..." /></div>
+      <div class="user"></div>
+    </header>
+    <div class="layout">
+      <aside class="sidebar">
+        <nav>
+          <a class="active" href="#">Meus projetos</a>
+        </nav>
+      </aside>
+      <main class="content">
+        <section class="panel">
+          <div class="panel-header">
+            <h2>Lista completa</h2>
+            <div class="panel-actions">
+              <button id="addProjectBtn">+ Adicionar novo</button>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="toolbar">
+              <input id="filter" placeholder="Filtrar por região..." />
+            </div>
+            <table class="list">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Nome</th>
+                  <th>Região</th>
+                  <th>Data</th>
+                </tr>
+              </thead>
+              <tbody id="projectsTbody"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="projectDialog">
+      <form id="projectForm" method="dialog">
+        <h3>Novo projeto</h3>
+        <input id="p_nome" placeholder="Nome" required />
+        <input id="p_regiao" placeholder="Região" required />
+        <textarea id="p_desc" placeholder="Descrição"></textarea>
+        <menu>
+          <button type="reset">Cancelar</button>
+          <button type="submit">Salvar</button>
+        </menu>
+      </form>
+    </dialog>
+
+    <script src="/web/main.js"></script>
+  </body>
+  </html>
+
+
