@@ -20,15 +20,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - run: npm ci
-      - run: npm run build
-
       - name: rsync deployments
         uses: burnett01/rsync-deployments@5.1
         with:
           switches: -avzr --delete
           path: ./*
           remote_path: /var/www/my-app/
-          remote_host: ec2-54-229-115-107.eu-west-1.compute.amazonaws.com
+          remote_host: ec2-52-90-18-78.compute-1.amazonaws.com
           remote_user: ubuntu
           remote_key: '${{ secrets.SSH_PRIVATE_KEY }}'
