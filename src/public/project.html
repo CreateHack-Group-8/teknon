@@ -3,25 +3,33 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Meus projetos</title>
+    <title>Pessoas do Projeto</title>
     <link rel="stylesheet" href="/web/styles.css" />
   </head>
   <body>
     <header class="topbar">
       <div class="brand"><svg width="192" height="31" viewBox="0 0 192 31" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M167.865 30.3888H161.766V0H175.343C184.518 0 191.996 7.42484 191.996 16.6528V30.3888H185.897V16.6528C185.897 10.819 181.177 6.09897 175.343 6.09897H167.865V30.3888Z" fill="#0D3063"/>
-<path d="M158.037 15.2209V15.274H157.984C157.931 23.6004 151.142 30.3888 142.763 30.3888C134.383 30.3888 127.595 23.6004 127.542 15.274V15.2209C127.542 15.1679 127.542 15.1679 127.542 15.1679C127.595 6.78843 134.383 0.0530396 142.763 0.0530396C151.142 0.0530396 157.931 6.78843 157.984 15.1679H158.037C158.037 15.1679 158.037 15.1679 158.037 15.2209ZM142.763 24.2368C147.748 24.2368 151.832 20.2062 151.885 15.2209C151.832 10.2357 147.748 6.15201 142.763 6.15201C137.778 6.15201 133.694 10.2357 133.641 15.2209C133.694 20.2062 137.778 24.2368 142.763 24.2368Z" fill="#0D3063"/>
+<path d="M158.037 15.2209V15.274H157.984C157.931 23.6004 151.142 30.3888 142.763 30.3888C134.383 30.3888 127.595 23.6004 127.542 15.274V15.2209C127.542 15.1679 127.542 15.1679 127.542 15.1679C127.595 6.78843 134.383 0.0530396 142.763 0.0530396C151.142 0.0530396 157.931 6.78843 157.984 15.1679H158037C158.037 15.1679 158.037 15.1679 158.037 15.2209ZM142.763 24.2368C147.748 24.2368 151.832 20.2062 151.885 15.2209C151.832 10.2357 147.748 6.15201 142.763 6.15201C137.778 6.15201 133.694 10.2357 133.641 15.2209C133.694 20.2062 137.778 24.2368 142.763 24.2368Z" fill="#0D3063"/>
 <path d="M99.4171 30.3888H93.3181V0H106.895C116.07 0 123.548 7.42484 123.548 16.6528V30.3888H117.449V16.6528C117.449 10.819 112.729 6.09897 106.895 6.09897H99.4171V30.3888Z" fill="#0D3063"/>
 <path d="M78.3239 13.0465C84.7411 15.327 89.3551 21.479 89.3551 28.6917V30.3888H83.2031V28.6917C83.2031 22.9109 78.483 18.1908 72.7022 18.1908H67.9291V30.3888H61.7771V0H67.9291V12.0388H71.1112L81.3468 0H89.3551L78.3239 13.0465Z" fill="#0D3063"/>
 <path d="M30.2361 12.1449H51.8211V18.2969H36.3881V18.9333C36.3881 21.9033 38.7746 24.2898 41.7446 24.2898H57.814V30.3888H41.7446C35.4335 30.3888 30.2361 25.2444 30.2361 18.9333V12.1449ZM57.814 0V6.15201H30.2361V0H57.814Z" fill="#0D3063"/>
 <path d="M27.578 0V6.09897H16.865V30.3888H10.713V6.09897H0V0H27.578Z" fill="#0D3063"/>
 </svg></div>
-      <div class="user"></div>
+      <div class="welcome">
+        <div class="welcome-text">
+          <div>Bem-vindo</div>
+          <div class="subtitle">Aqui você acompanha todos as informações disponíveis</div>
+        </div>
+      </div>
+      <div class="user">
+      </div>
     </header>
     <div class="layout">
       <aside class="sidebar">
         <nav>
-          <a class="active" href="#">Meus projetos</a>
+          <a href="/web/">Meus projetos</a>
+          <a class="active" href="#">Pessoas</a>
         </nav>
       </aside>
       <main class="content">
@@ -29,45 +37,28 @@
           <div class="panel-header">
             <h2>Lista completa</h2>
             <div class="panel-actions">
-              <button id="addProjectBtn">+ Adicionar novo</button>
+              <button id="addPersonBtn">+ Adicionar novo</button>
             </div>
           </div>
           <div class="panel-body">
             <div class="toolbar">
-              <input id="filter" placeholder="Filtrar por região..." />
+              <input id="filter" placeholder="Buscar..." />
             </div>
-            <table class="list">
-              <thead>
-                                  <tr>
-                    <th>#</th>
-                    <th>Nome</th>
-                    <th>Região</th>
-                    <th>Data</th>
-                    <th></th>
-                  </tr>
-              </thead>
-              <tbody id="projectsTbody"></tbody>
-            </table>
+            <div class="persons-list">
+              <div class="list-header">
+                <span>#</span>
+                <span>Nome completo</span>
+                <span>Data de Nascimento</span>
+                <span>Gênero</span>
+                <span>Progresso</span>
+              </div>
+              <div id="personsList"></div>
+            </div>
           </div>
         </section>
       </main>
     </div>
 
-    <dialog id="projectDialog">
-      <form id="projectForm" method="dialog">
-        <h3>Novo projeto</h3>
-        <input id="p_nome" placeholder="Nome" required />
-        <input id="p_regiao" placeholder="Região" required />
-        <textarea id="p_desc" placeholder="Descrição"></textarea>
-        <menu>
-          <button type="reset">Cancelar</button>
-          <button type="submit">Salvar</button>
-        </menu>
-      </form>
-    </dialog>
-
-    <script src="/web/main.js"></script>
+    <script src="/web/project.js"></script>
   </body>
-  </html>
-
-
+</html>

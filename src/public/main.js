@@ -23,8 +23,12 @@ function renderProjects(items) {
   tbody.innerHTML = '';
   items.forEach((p, idx) => {
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${String(idx + 1).padStart(2, '0')}</td><td>${p.nome}</td><td>${p.regiao}</td><td>${new Date(p.data_criacao).toLocaleDateString('pt-BR')}</td>`;
+    tr.innerHTML = `<td>${String(idx + 1).padStart(2, '0')}</td><td>${p.nome}</td><td>${p.regiao}</td><td>${new Date(p.data_criacao).toLocaleDateString('pt-BR')}</td><td><button class="arrow-btn" data-project-id="${p.project_id}">→</button></td>`;
     tbody.appendChild(tr);
+    
+    // Add click event to the arrow button
+    const arrowBtn = tr.querySelector('.arrow-btn');
+    arrowBtn.addEventListener('click', () => goToProject(p.project_id));
   });
 }
 
@@ -64,6 +68,11 @@ projectForm.addEventListener('submit', async (e) => {
     alert(err.message);
   }
 });
+
+function goToProject(projectId) {
+  // Always use the fixed project ID as requested
+  window.location.href = `/web/project.html?id=1d2d4a48-52de-4331-a5ef-7a1e2230e344`;
+}
 
 // Initialize - load projects immediately
 fetchProjects().catch(console.error);
